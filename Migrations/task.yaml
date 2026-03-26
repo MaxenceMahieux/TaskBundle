@@ -1,0 +1,9 @@
+# --------------------------------------------------------------------------------------------------
+# Execute migrations with:
+# bin/console doctrine:migrations:migrate --em=default --configuration=var/plugins/TaskBundle/Migrations/task.yaml
+# --------------------------------------------------------------------------------------------------
+
+table_storage:
+    table_name: 'bundle_migration_task'
+migrations_paths:
+    'TaskBundle\Migrations': '/opt/kimai/var/plugins/TaskBundle/Migrations'

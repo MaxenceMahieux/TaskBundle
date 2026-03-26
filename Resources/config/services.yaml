@@ -1,0 +1,43 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    KimaiPlugin\TaskBundle\:
+        resource: '../../*'
+        exclude: '../../{Entity,Migrations,Resources}'
+
+    KimaiPlugin\TaskBundle\Controller\:
+        resource: '../../Controller'
+        tags: ['controller.service_arguments']
+
+    KimaiPlugin\TaskBundle\Repository\TaskRepository:
+        tags: ['doctrine.repository_service']
+
+    KimaiPlugin\TaskBundle\Repository\TaskColumnRepository:
+        tags: ['doctrine.repository_service']
+
+    KimaiPlugin\TaskBundle\Repository\TaskCommentRepository:
+        tags: ['doctrine.repository_service']
+
+    KimaiPlugin\TaskBundle\Repository\TaskHistoryRepository:
+        tags: ['doctrine.repository_service']
+
+    KimaiPlugin\TaskBundle\Repository\TaskAttachmentRepository:
+        tags: ['doctrine.repository_service']
+
+    KimaiPlugin\TaskBundle\Repository\TaskSubtaskRepository:
+        tags: ['doctrine.repository_service']
+
+    KimaiPlugin\TaskBundle\Repository\TaskRecurrenceRepository:
+        tags: ['doctrine.repository_service']
+
+    # Services
+    KimaiPlugin\TaskBundle\Service\TaskAttachmentService:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+
+    # Widgets - autoconfigure will tag them with WidgetInterface
+    KimaiPlugin\TaskBundle\Widget\:
+        resource: '../../Widget'

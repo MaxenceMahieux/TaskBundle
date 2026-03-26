@@ -1,0 +1,273 @@
+{% extends 'base.html.twig' %}
+{% import "macros/widgets.html.twig" as widgets %}
+
+{% block page_title %}{{ 'Kanban Board'|trans }}{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .kanban-container {
+        display: flex;
+        gap: 1rem;
+        overflow-x: auto;
+        padding-bottom: 1rem;
+    }
+    .kanban-column {
+        flex: 0 0 300px;
+        min-width: 300px;
+    }
+    .kanban-column-header {
+        padding: 0.75rem 1rem;
+        font-weight: 600;
+        border-top: 3px solid;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .kanban-column-body {
+        padding: 0.75rem;
+        min-height: 200px;
+    }
+    .kanban-card {
+        background: var(--tblr-card-bg);
+        border: 1px solid var(--tblr-border-color);
+        border-radius: var(--tblr-border-radius);
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+        cursor: grab;
+        transition: box-shadow 0.15s ease, transform 0.15s ease;
+    }
+    .kanban-card:hover {
+        box-shadow: var(--tblr-box-shadow);
+        border-color: var(--tblr-primary);
+    }
+    .kanban-card.dragging {
+        opacity: 0.5;
+        transform: rotate(2deg);
+    }
+    .kanban-card-title {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        line-height: 1.3;
+    }
+    .kanban-card-title a {
+        color: inherit;
+        text-decoration: none;
+    }
+    .kanban-card-title a:hover {
+        color: var(--tblr-primary);
+    }
+    .kanban-column-body.drag-over {
+        background: var(--tblr-bg-surface-tertiary);
+        border-radius: var(--tblr-border-radius);
+    }
+    .task-overdue {
+        border-left: 3px solid var(--tblr-danger) !important;
+    }
+</style>
+{% endblock %}
+
+{% block main %}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <form method="get" class="d-flex gap-2 align-items-center">
+            <select name="project" class="form-select form-select-sm" style="width: auto;" onchange="this.form.submit()">
+                <option value="">{{ 'All Projects'|trans }}</option>
+                {% for project in projects %}
+                    <option value="{{ project.id }}" {{ currentProject and currentProject.id == project.id ? 'selected' : '' }}>
+                        {{ project.name }}
+                    </option>
+                {% endfor %}
+            </select>
+            <label class="form-check mb-0">
+                <input type="checkbox" name="my_tasks" value="1" class="form-check-input"
+                       {{ myTasksOnly ? 'checked' : '' }} onchange="this.form.submit()">
+                <span class="form-check-label">{{ 'My tasks only'|trans }}</span>
+            </label>
+        </form>
+        <div class="btn-list">
+            <a href="{{ path('task_create') }}" class="btn">
+                {{ icon('create', true) }} {{ 'create'|trans }}
+            </a>
+            <a href="{{ path('task_index') }}" class="btn">
+                {{ icon('list', true) }} {{ 'list'|trans }}
+            </a>
+            <a href="{{ path('task_column_index') }}" class="btn">
+                {{ icon('settings', true) }} {{ 'Columns'|trans }}
+            </a>
+        </div>
+    </div>
+
+    <div class="kanban-container">
+        {% for column in columns %}
+        <div class="kanban-column" data-column-id="{{ column.id }}">
+            <div class="card">
+                <div class="kanban-column-header card-header" style="border-color: {{ column.color }};">
+                    <h3 class="card-title">{{ column.name }}</h3>
+                    <span class="badge" style="background-color: {{ column.color }}; color: {{ column.color|font_contrast }}">
+                        {{ tasksByColumn[column.id]|length }}
+                    </span>
+                </div>
+                <div class="kanban-column-body card-body" data-column-id="{{ column.id }}">
+                    {% for task in tasksByColumn[column.id] %}
+                    <div class="kanban-card {{ task.overdue ? 'task-overdue' : '' }}"
+                         data-task-id="{{ task.id }}"
+                         draggable="true">
+                        <div class="kanban-card-title">
+                            <a href="{{ path('task_show', {id: task.id}) }}">{{ task.title }}</a>
+                        </div>
+                        <div class="d-flex flex-wrap gap-1 mb-2">
+                            {{ widgets.label_color(task.project.name, task.project.color|colorize(task.project.name)) }}
+                            <span class="badge" style="background-color: {{ task.priority.color }}; color: {{ task.priority.color|font_contrast }}">
+                                {{ task.priority.label }}
+                            </span>
+                        </div>
+                        <div class="d-flex align-items-center text-muted small">
+                            {% if task.assignee %}
+                                {{ widgets.user_avatar(task.assignee, false, 'avatar-xs') }}
+                                <span class="ms-1">{{ task.assignee.displayName }}</span>
+                            {% endif %}
+                            {% if task.dueDate %}
+                                <span class="ms-auto {{ task.overdue ? 'text-danger' : '' }}">
+                                    {{ icon('calendar') }} {{ task.dueDate|date_short }}
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="text-muted text-center py-3 empty-column">
+                        {{ 'No tasks'|trans }}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const columns = document.querySelectorAll('.kanban-column-body');
+
+    function initDragEvents() {
+        document.querySelectorAll('.kanban-card').forEach(card => {
+            card.addEventListener('dragstart', handleDragStart);
+            card.addEventListener('dragend', handleDragEnd);
+        });
+    }
+
+    function handleDragStart(e) {
+        this.classList.add('dragging');
+        e.dataTransfer.setData('text/plain', this.dataset.taskId);
+        e.dataTransfer.effectAllowed = 'move';
+    }
+
+    function handleDragEnd() {
+        this.classList.remove('dragging');
+        columns.forEach(col => col.classList.remove('drag-over'));
+        updateEmptyStates();
+    }
+
+    function updateEmptyStates() {
+        columns.forEach(column => {
+            const cards = column.querySelectorAll('.kanban-card');
+            const emptyMsg = column.querySelector('.empty-column');
+
+            if (cards.length === 0 && !emptyMsg) {
+                const div = document.createElement('div');
+                div.className = 'text-muted text-center py-3 empty-column';
+                div.textContent = '{{ 'No tasks'|trans }}';
+                column.appendChild(div);
+            } else if (cards.length > 0 && emptyMsg) {
+                emptyMsg.remove();
+            }
+        });
+    }
+
+    function updateColumnCounts() {
+        document.querySelectorAll('.kanban-column').forEach(col => {
+            const body = col.querySelector('.kanban-column-body');
+            const badge = col.querySelector('.kanban-column-header .badge');
+            if (body && badge) {
+                badge.textContent = body.querySelectorAll('.kanban-card').length;
+            }
+        });
+    }
+
+    columns.forEach(column => {
+        column.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            column.classList.add('drag-over');
+        });
+
+        column.addEventListener('dragleave', (e) => {
+            if (!column.contains(e.relatedTarget)) {
+                column.classList.remove('drag-over');
+            }
+        });
+
+        column.addEventListener('drop', (e) => {
+            e.preventDefault();
+            column.classList.remove('drag-over');
+
+            const taskId = e.dataTransfer.getData('text/plain');
+            const card = document.querySelector(`[data-task-id="${taskId}"]`);
+            const columnId = column.dataset.columnId;
+
+            if (!card) return;
+
+            // Remove empty message if exists
+            const emptyMsg = column.querySelector('.empty-column');
+            if (emptyMsg) emptyMsg.remove();
+
+            // Move card to new column
+            column.appendChild(card);
+
+            // Update counts and empty states
+            updateColumnCounts();
+            updateEmptyStates();
+
+            // Send to server
+            const positions = Array.from(column.querySelectorAll('.kanban-card'))
+                .map(c => c.dataset.taskId);
+
+            const formData = new FormData();
+            formData.append('task_id', taskId);
+            formData.append('column_id', columnId);
+            positions.forEach((pos, idx) => {
+                formData.append('positions[' + idx + ']', pos);
+            });
+
+            fetch('{{ path('task_kanban_move') }}', {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            }).then(response => {
+                if (!response.ok) {
+                    console.error('Server error:', response.status);
+                    return response.text().then(text => { throw new Error(text); });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (!data.success) {
+                    console.error('Failed to update task:', data.error);
+                    location.reload();
+                }
+            })
+            .catch(err => {
+                console.error('Request failed:', err);
+                location.reload();
+            });
+        });
+    });
+
+    initDragEvents();
+});
+</script>
+{% endblock %}

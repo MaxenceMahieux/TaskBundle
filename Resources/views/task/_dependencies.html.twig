@@ -1,0 +1,59 @@
+{% set blockedBy = task.blockedByTasks %}
+{% set blocks = task.blocksTasks %}
+
+{% if blockedBy|length > 0 or blocks|length > 0 %}
+<div class="card mb-3">
+    <div class="card-header">
+        <h3 class="card-title">{{ icon('link') }} {{ 'Dependencies'|trans }}</h3>
+    </div>
+    <div class="card-body">
+        {% if blockedBy|length > 0 %}
+        <div class="mb-3">
+            <h5 class="mb-2">{{ 'Blocked by'|trans }}</h5>
+            <div class="list-group list-group-flush">
+                {% for blockerTask in blockedBy %}
+                <div class="list-group-item d-flex align-items-center justify-content-between">
+                    <div>
+                        <a href="{{ path('task_show', {id: blockerTask.id}) }}" class="text-reset">
+                            {{ blockerTask.title }}
+                        </a>
+                        <span class="badge ms-2" style="background-color: {{ blockerTask.column.color }}; color: {{ blockerTask.column.color|font_contrast }}">
+                            {{ blockerTask.column.name }}
+                        </span>
+                    </div>
+                    <form action="{{ path('task_dependency_remove', {taskId: task.id, blockerId: blockerTask.id}) }}" method="post" class="d-inline">
+                        <input type="hidden" name="_token" value="{{ csrf_token('dependency_remove' ~ task.id ~ blockerTask.id) }}">
+                        <button type="submit" class="btn btn-sm btn-ghost-danger" title="{{ 'Remove dependency'|trans }}">
+                            {{ icon('trash') }}
+                        </button>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if blocks|length > 0 %}
+        <div class="mb-3">
+            <h5 class="mb-2">{{ 'Blocks'|trans }}</h5>
+            <div class="list-group list-group-flush">
+                {% for blockedTask in blocks %}
+                <div class="list-group-item d-flex align-items-center">
+                    <a href="{{ path('task_show', {id: blockedTask.id}) }}" class="text-reset">
+                        {{ blockedTask.title }}
+                    </a>
+                    <span class="badge ms-2" style="background-color: {{ blockedTask.column.color }}; color: {{ blockedTask.column.color|font_contrast }}">
+                        {{ blockedTask.column.name }}
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if blockedBy|length == 0 and blocks|length == 0 %}
+        <p class="text-muted text-center mb-0">{{ 'No dependencies'|trans }}</p>
+        {% endif %}
+    </div>
+</div>
+{% endif %}

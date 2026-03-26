@@ -1,0 +1,36 @@
+{
+    "name": "plugiit/task-bundle",
+    "description": "Task management with Kanban board for Kimai - by Plugiit",
+    "type": "kimai-plugin",
+    "version": "1.0.0",
+    "keywords": [
+        "kimai",
+        "kimai-plugin",
+        "task",
+        "kanban",
+        "project-management"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Maxence - Plugiit",
+            "homepage": "https://plugiit.com"
+        }
+    ],
+    "extra": {
+        "kimai": {
+            "require": 25200,
+            "name": "Task Management"
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "KimaiPlugin\\TaskBundle\\": ""
+        }
+    },
+    "config": {
+        "platform": {
+            "php": "8.1.3"
+        }
+    }
+}

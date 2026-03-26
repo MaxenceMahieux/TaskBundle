@@ -1,0 +1,68 @@
+{% import "macros/widgets.html.twig" as widgets %}
+
+{% set historyEntries = task.history|default([]) %}
+
+{% if historyEntries|length > 0 %}
+<div class="card mb-3">
+    <div class="card-header">
+        <h3 class="card-title">
+            {{ icon('audit') }} {{ 'History'|trans }}
+            <span class="badge bg-blue-lt ms-2">{{ historyEntries|length }}</span>
+        </h3>
+    </div>
+    <div class="card-body p-0">
+        <div class="list-group list-group-flush">
+            {% for entry in historyEntries|reverse|slice(0, 20) %}
+            <div class="list-group-item">
+                <div class="d-flex align-items-center">
+                    <div class="me-3">
+                        {% if entry.action == 'created' %}
+                            <span class="avatar avatar-sm bg-green text-white">{{ icon('create') }}</span>
+                        {% elseif entry.action == 'status_changed' %}
+                            <span class="avatar avatar-sm bg-purple text-white">{{ icon('activity') }}</span>
+                        {% elseif entry.action == 'assigned' %}
+                            <span class="avatar avatar-sm bg-cyan text-white">{{ icon('user') }}</span>
+                        {% elseif entry.action == 'comment_added' %}
+                            <span class="avatar avatar-sm bg-blue text-white">{{ icon('comment') }}</span>
+                        {% elseif entry.action == 'attachment_added' %}
+                            <span class="avatar avatar-sm bg-orange text-white">{{ icon('upload') }}</span>
+                        {% elseif entry.action == 'subtask_completed' %}
+                            <span class="avatar avatar-sm bg-success text-white">{{ icon('success') }}</span>
+                        {% else %}
+                            <span class="avatar avatar-sm bg-secondary text-white">{{ icon('edit') }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="flex-fill">
+                        <div>
+                            <strong>{{ entry.user.displayName }}</strong>
+                            {% if entry.action == 'created' %}
+                                {{ 'Task created'|trans }}
+                            {% elseif entry.action == 'status_changed' %}
+                                {{ 'Status changed'|trans }}:
+                                {% if entry.oldValue %}<s class="text-muted">{{ entry.oldValue }}</s>{% endif %}
+                                {{ icon('right') }}
+                                <strong>{{ entry.newValue }}</strong>
+                            {% elseif entry.action == 'assigned' %}
+                                {{ 'Assigned to'|trans }}
+                                <strong>{{ entry.newValue|default('Unassigned'|trans) }}</strong>
+                            {% elseif entry.action == 'comment_added' %}
+                                {{ 'added a comment'|trans }}
+                            {% elseif entry.action == 'attachment_added' %}
+                                {{ 'uploaded'|trans }} <strong>{{ entry.newValue }}</strong>
+                            {% elseif entry.action == 'subtask_completed' %}
+                                {{ 'completed subtask'|trans }} <strong>{{ entry.newValue }}</strong>
+                            {% elseif entry.action == 'updated' and entry.field %}
+                                {{ 'updated'|trans }} <code>{{ entry.field }}</code>
+                            {% else %}
+                                {{ entry.action|trans }}
+                            {% endif %}
+                        </div>
+                        <small class="text-muted">{{ entry.createdAt|date_short }}</small>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}

@@ -1,0 +1,305 @@
+{% extends 'base.html.twig' %}
+{% import "macros/widgets.html.twig" as widgets %}
+{% import "@Task/task/actions.html.twig" as actions %}
+
+{% block page_title %}{{ 'Tasks'|trans }}{% endblock %}
+
+{% block main %}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="btn-list">
+            <div class="dropdown">
+                <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    {{ icon('filter') }} {{ 'Filters'|trans }}
+                </button>
+                <div class="dropdown-menu dropdown-menu-card p-3" style="min-width: 400px;">
+                    <div>
+                        <form action="{{ path('task_index') }}" method="get">
+                            <div class="mb-3">
+                                <label class="form-label">{{ 'Search'|trans }}</label>
+                                <input type="text" class="form-control" name="search" value="{{ app.request.query.get('search') }}" placeholder="{{ 'Search tasks...'|trans }}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">{{ 'Status'|trans }}</label>
+                                <select class="form-select" name="column">
+                                    <option value="">{{ 'All Statuses'|trans }}</option>
+                                    {% for column in columns %}
+                                    <option value="{{ column.id }}" {% if app.request.query.get('column')|default('') == column.id|default('') %}selected{% endif %}>
+                                        {{ column.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">{{ 'Assignee'|trans }}</label>
+                                <select class="form-select" name="assignee">
+                                    <option value="">{{ 'All Users'|trans }}</option>
+                                    {% for user in users %}
+                                    <option value="{{ user.id }}" {% if app.request.query.get('assignee')|default('') == user.id|default('') %}selected{% endif %}>
+                                        {{ user.displayName }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" name="my_tasks" value="1" id="my-tasks-filter" {% if app.request.query.get('my_tasks') == '1' %}checked{% endif %}>
+                                    <label class="form-check-label" for="my-tasks-filter">{{ 'My tasks only'|trans }}</label>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary flex-grow-1">
+                                    {{ icon('search') }} {{ 'Apply filters'|trans }}
+                                </button>
+                                <a href="{{ path('task_index') }}" class="btn btn-secondary">
+                                    {{ 'Clear filters'|trans }}
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="btn-list">
+            <a href="{{ path('task_kanban') }}" class="btn">
+                {{ icon('columns') }} {{ 'Kanban Board'|trans }}
+            </a>
+            <a href="{{ path('task_create') }}" class="btn btn-primary">
+                {{ icon('create') }} {{ 'Create Task'|trans }}
+            </a>
+        </div>
+    </div>
+
+    {# Bulk Actions Toolbar #}
+    <div class="card mb-3 d-none" id="bulk-actions">
+        <div class="card-body py-2">
+            <div class="d-flex align-items-center gap-3">
+                <span class="text-muted" id="selected-count">0 {{ 'selected'|trans }}</span>
+                <div class="vr"></div>
+                <div class="btn-list">
+                    <div class="dropdown">
+                        <button class="btn btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            {{ icon('activity') }} {{ 'Move to'|trans }}
+                        </button>
+                        <div class="dropdown-menu">
+                            {% for column in columns %}
+                            <a href="#" class="dropdown-item bulk-move-action" data-column-id="{{ column.id }}">
+                                <span class="status-dot" style="background-color: {{ column.color }}"></span>
+                                {{ column.name }}
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            {{ icon('user') }} {{ 'Assign to'|trans }}
+                        </button>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item bulk-assign-action" data-user-id="">{{ 'Unassigned'|trans }}</a>
+                            <div class="dropdown-divider"></div>
+                            {% for user in users %}
+                            <a href="#" class="dropdown-item bulk-assign-action" data-user-id="{{ user.id }}">
+                                {{ user.displayName }}
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-danger" id="bulk-delete-btn">
+                        {{ icon('trash') }} {{ 'Delete selected'|trans }}
+                    </button>
+                </div>
+                <div class="ms-auto">
+                    <button type="button" class="btn btn-sm" id="bulk-cancel-btn">
+                        {{ icon('cancel') }} {{ 'Cancel'|trans }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if tasks is empty %}
+        {{ widgets.nothing_found() }}
+    {% else %}
+    <div class="card">
+        <table class="table table-vcenter card-table">
+            <thead>
+                <tr>
+                    <th class="w-1">
+                        <input type="checkbox" class="form-check-input" id="select-all">
+                    </th>
+                    <th>{{ 'Title'|trans }}</th>
+                    <th>{{ 'Project'|trans }}</th>
+                    <th>{{ 'Assignee'|trans }}</th>
+                    <th class="text-center">{{ 'Status'|trans }}</th>
+                    <th class="text-center">{{ 'Priority'|trans }}</th>
+                    <th>{{ 'Due Date'|trans }}</th>
+                    <th class="w-1"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in tasks %}
+                <tr class="{{ task.overdue ? 'table-danger' : '' }}">
+                    <td>
+                        <input type="checkbox" class="form-check-input task-checkbox" value="{{ task.id }}">
+                    </td>
+                    <td>
+                        <a href="{{ path('task_show', {id: task.id}) }}" class="text-reset">
+                            {{ task.title }}
+                        </a>
+                        {% if task.internal %}
+                            <span class="badge bg-secondary-lt ms-1">{{ 'Internal'|trans }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if task.project %}
+                            {{ widgets.label_color(task.project.name, task.project.color|default('#6c757d')) }}
+                        {% else %}
+                            <span class="text-muted">&ndash;</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if task.assignee %}
+                            {{ widgets.user_avatar(task.assignee, false, 'avatar-sm') }}
+                            {{ task.assignee.displayName }}
+                        {% else %}
+                            <span class="text-muted">{{ 'Unassigned'|trans }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-center">
+                        <span class="badge" style="background-color: {{ task.column.color }}; color: {{ task.column.color|font_contrast }}">
+                            {{ task.column.name }}
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        <span class="badge" style="background-color: {{ task.priority.color }}; color: {{ task.priority.color|font_contrast }}">
+                            {{ task.priority.label }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if task.dueDate %}
+                            {{ task.dueDate|date_short }}
+                            {% if task.overdue %}
+                                <span class="badge bg-danger ms-1">{{ 'Overdue'|trans }}</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="text-muted">&ndash;</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ actions.task(task, 'index') }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const selectAll = document.getElementById('select-all');
+    const checkboxes = document.querySelectorAll('.task-checkbox');
+    const bulkActions = document.getElementById('bulk-actions');
+    const selectedCount = document.getElementById('selected-count');
+    const cancelBtn = document.getElementById('bulk-cancel-btn');
+    const deleteBtn = document.getElementById('bulk-delete-btn');
+
+    function getSelectedIds() {
+        return Array.from(document.querySelectorAll('.task-checkbox:checked')).map(cb => cb.value);
+    }
+
+    function updateBulkUI() {
+        const count = getSelectedIds().length;
+        if (count > 0) {
+            bulkActions.classList.remove('d-none');
+            selectedCount.textContent = count + ' {{ 'selected'|trans }}';
+        } else {
+            bulkActions.classList.add('d-none');
+        }
+        selectAll.checked = count === checkboxes.length && checkboxes.length > 0;
+        selectAll.indeterminate = count > 0 && count < checkboxes.length;
+    }
+
+    selectAll.addEventListener('change', function() {
+        checkboxes.forEach(cb => cb.checked = this.checked);
+        updateBulkUI();
+    });
+
+    checkboxes.forEach(cb => cb.addEventListener('change', updateBulkUI));
+
+    cancelBtn.addEventListener('click', function() {
+        selectAll.checked = false;
+        checkboxes.forEach(cb => cb.checked = false);
+        updateBulkUI();
+    });
+
+    // Bulk move
+    document.querySelectorAll('.bulk-move-action').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const ids = getSelectedIds();
+            if (ids.length === 0) return;
+
+            fetch('{{ path('task_bulk_move') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    task_ids: ids,
+                    column_id: this.dataset.columnId,
+                    _token: '{{ csrf_token('bulk') }}'
+                })
+            }).then(r => r.json()).then(data => {
+                if (data.success) location.reload();
+            });
+        });
+    });
+
+    // Bulk assign
+    document.querySelectorAll('.bulk-assign-action').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const ids = getSelectedIds();
+            if (ids.length === 0) return;
+
+            fetch('{{ path('task_bulk_assign') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    task_ids: ids,
+                    user_id: this.dataset.userId || null,
+                    _token: '{{ csrf_token('bulk') }}'
+                })
+            }).then(r => r.json()).then(data => {
+                if (data.success) location.reload();
+            });
+        });
+    });
+
+    // Bulk delete
+    deleteBtn.addEventListener('click', function() {
+        const ids = getSelectedIds();
+        if (ids.length === 0) return;
+        if (!confirm('{{ 'Confirm bulk delete'|trans }}')) return;
+
+        fetch('{{ path('task_bulk_delete') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+                task_ids: ids,
+                _token: '{{ csrf_token('bulk') }}'
+            })
+        }).then(r => r.json()).then(data => {
+            if (data.success) location.reload();
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% set data = widget.data(options) %}
+{% set options = widget.options(options) %}
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">{{ widget.title|trans }}</h3>
+        <div class="card-actions">
+            <a href="{{ path(options.route) }}" class="btn btn-sm">
+                {{ icon('kanban') }}
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row g-2">
+            {% for column in data %}
+            <div class="col-6 col-sm-4 col-md-3">
+                <div class="card card-sm">
+                    <div class="card-body p-2 text-center">
+                        <div class="h1 mb-1" style="color: {{ column.color }}">
+                            {{ column.count }}
+                        </div>
+                        <div class="small text-muted">
+                            <span class="status-dot" style="background-color: {{ column.color }}"></span>
+                            {{ column.name }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>

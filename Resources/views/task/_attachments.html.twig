@@ -1,0 +1,59 @@
+{% set attachments = task.attachments|default([]) %}
+
+<div class="card mb-3">
+    <div class="card-header">
+        <h3 class="card-title">
+            {{ icon('upload') }} {{ 'Attachments'|trans }}
+            {% if attachments|length > 0 %}
+            <span class="badge bg-blue-lt ms-2">{{ attachments|length }}</span>
+            {% endif %}
+        </h3>
+    </div>
+    <div class="card-body p-0">
+        {% if attachments|length == 0 %}
+        <div class="text-center text-muted py-4">
+            <p class="mb-0">{{ 'No attachments'|trans }}</p>
+        </div>
+        {% else %}
+        <div class="list-group list-group-flush">
+            {% for attachment in attachments %}
+            <div class="list-group-item d-flex align-items-center">
+                <div class="me-3">
+                    {{ icon('other') }}
+                </div>
+                <div class="flex-fill">
+                    <div>{{ attachment.filename }}</div>
+                    <small class="text-muted">
+                        {{ (attachment.size / 1024)|number_format(1) }} KB
+                        - {{ attachment.uploadedBy.displayName }}
+                        - {{ attachment.uploadedAt|date_short }}
+                    </small>
+                </div>
+                <div class="btn-list">
+                    <a href="{{ path('task_attachment_download', {taskId: task.id, id: attachment.id}) }}" class="btn btn-sm">
+                        {{ icon('download') }}
+                    </a>
+                    <form action="{{ path('task_attachment_delete', {taskId: task.id, id: attachment.id}) }}" method="post" class="d-inline">
+                        <input type="hidden" name="_token" value="{{ csrf_token('attachment_delete' ~ attachment.id) }}">
+                        <button type="submit" class="btn btn-sm btn-ghost-danger" onclick="return confirm('{{ 'confirm.delete'|trans }}');">
+                            {{ icon('trash') }}
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    <div class="card-footer">
+        <form action="{{ path('task_attachment_upload', {taskId: task.id}) }}" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="_token" value="{{ csrf_token('attachment_upload' ~ task.id) }}">
+            <div class="input-group">
+                <input type="file" class="form-control" name="file" required>
+                <button type="submit" class="btn btn-primary">
+                    {{ icon('upload') }} {{ 'Upload File'|trans }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

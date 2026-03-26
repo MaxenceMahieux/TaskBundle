@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block page_title %}{{ task.id ? 'Edit Task'|trans : 'Create Task'|trans }}{% endblock %}
+
+{% block main %}
+    {% set formOptions = {
+        'title': (task.id ? 'Edit Task'|trans : 'Create Task'|trans),
+        'form': form,
+        'back': path('task_index')
+    } %}
+    {% embed 'default/_form.html.twig' with formOptions %}
+        {% block form_body %}
+            <div class="row">
+                <div class="col-md-9">
+                    {{ form_row(form.title) }}
+                </div>
+                <div class="col-md-3">
+                    {{ form_row(form.project) }}
+                </div>
+            </div>
+
+            {{ form_row(form.description) }}
+
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(form.assignee) }}
+                </div>
+                <div class="col-md-3">
+                    {{ form_row(form.column) }}
+                </div>
+                <div class="col-md-3">
+                    {{ form_row(form.priority) }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    {{ form_row(form.dueDate) }}
+                </div>
+                <div class="col-md-4">
+                    {{ form_row(form.estimatedMinutes) }}
+                </div>
+                <div class="col-md-4 d-flex align-items-end pb-3">
+                    {{ form_row(form.isInternal) }}
+                </div>
+            </div>
+
+            {{ form_rest(form) }}
+        {% endblock %}
+    {% endembed %}
+{% endblock %}

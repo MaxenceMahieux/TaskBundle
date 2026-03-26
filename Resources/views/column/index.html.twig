@@ -1,0 +1,126 @@
+{% extends 'base.html.twig' %}
+{% import "macros/widgets.html.twig" as widgets %}
+
+{% block page_title %}{{ 'Task Columns'|trans }}{% endblock %}
+
+{% block main %}
+    <div class="d-flex justify-content-end mb-3">
+        <div class="btn-list">
+            <a href="{{ path('task_column_create') }}" class="btn">
+                {{ icon('create', true) }} {{ 'create'|trans }}
+            </a>
+            <a href="{{ path('task_index') }}" class="btn">
+                {{ icon('back', true) }} {{ 'Tasks'|trans }}
+            </a>
+        </div>
+    </div>
+
+    {% if columns is empty %}
+        {{ widgets.nothing_found() }}
+    {% else %}
+    <div class="card">
+        <div>
+            <table class="table table-vcenter card-table" id="columns-table">
+                <thead>
+                    <tr>
+                        <th style="width: 40px;"></th>
+                        <th>{{ 'Name'|trans }}</th>
+                        <th class="text-center">{{ 'Color'|trans }}</th>
+                        <th class="text-center">{{ 'Default'|trans }}</th>
+                        <th class="text-center">{{ 'Closed Status'|trans }}</th>
+                        <th class="w-1"></th>
+                    </tr>
+                </thead>
+                <tbody id="sortable-columns">
+                    {% for column in columns %}
+                    <tr data-id="{{ column.id }}">
+                        <td class="cursor-grab">
+                            <i class="fas fa-grip-vertical text-muted"></i>
+                        </td>
+                        <td>
+                            <span class="badge me-2" style="background-color: {{ column.color }}; color: {{ column.color|font_contrast }}">
+                                &nbsp;
+                            </span>
+                            {{ column.name }}
+                        </td>
+                        <td class="text-center">
+                            <span class="color-preview" style="display: inline-block; width: 24px; height: 24px; border-radius: 4px; background-color: {{ column.color }};"></span>
+                        </td>
+                        <td class="text-center">
+                            {% if column.isDefault %}
+                                <span class="badge bg-success">{{ 'yes'|trans }}</span>
+                            {% else %}
+                                <span class="text-muted">&ndash;</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if column.isClosedStatus %}
+                                <span class="badge bg-info">{{ 'yes'|trans }}</span>
+                            {% else %}
+                                <span class="text-muted">&ndash;</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="dropdown">
+                                <a href="#" class="link-secondary" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-end">
+                                    <a href="{{ path('task_column_edit', {id: column.id}) }}" class="dropdown-item">
+                                        {{ icon('edit') }} {{ 'edit'|trans }}
+                                    </a>
+                                    <div class="dropdown-divider"></div>
+                                    <form action="{{ path('task_column_delete', {id: column.id}) }}" method="post" class="d-inline">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ column.id) }}">
+                                        <button type="submit" class="dropdown-item text-danger" onclick="return confirm('{{ 'confirm.delete'|trans }}');">
+                                            {{ icon('trash') }} {{ 'delete'|trans }}
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tbody = document.getElementById('sortable-columns');
+    if (!tbody) return;
+
+    new Sortable(tbody, {
+        animation: 150,
+        handle: '.cursor-grab',
+        onEnd: function() {
+            const positions = Array.from(tbody.querySelectorAll('tr'))
+                .map(row => row.dataset.id);
+
+            const formData = new FormData();
+            positions.forEach((id, idx) => {
+                formData.append('positions[' + idx + ']', id);
+            });
+
+            fetch('{{ path('task_column_reorder') }}', {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            });
+        }
+    });
+});
+</script>
+<style>
+.cursor-grab { cursor: grab; }
+.cursor-grab:active { cursor: grabbing; }
+</style>
+{% endblock %}

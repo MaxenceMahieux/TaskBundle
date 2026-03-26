@@ -1,0 +1,165 @@
+Tasks: Tâches
+Task: Tâche
+Task List: Liste des tâches
+Kanban Board: Tableau Kanban
+Create Task: Créer une tâche
+Edit Task: Modifier la tâche
+Title: Titre
+Description: Description
+Project: Projet
+Assignee: Assigné
+Status: Statut
+Priority: Priorité
+Due Date: Date d'échéance
+Estimated Time: Temps estimé
+Actions: Actions
+Save: Enregistrer
+Back: Retour
+Back to list: Retour à la liste
+Edit: Modifier
+Delete: Supprimer
+No tasks found: Aucune tâche trouvée
+No tasks: Aucune tâche
+All Projects: Tous les projets
+My tasks only: Mes tâches uniquement
+List View: Vue liste
+Created: Créé
+Updated: Mis à jour
+Unassigned: Non assigné
+Internal: Interne
+Overdue: En retard
+Time Tracking: Suivi du temps
+Total time spent: Temps total passé
+Start Timer: Démarrer le chrono
+Stop Timer: Arrêter le chrono
+Timer running since: Chrono actif depuis
+Time Entries: Entrées de temps
+User: Utilisateur
+Date: Date
+Start: Début
+End: Fin
+Duration: Durée
+Customer: Client
+Task Columns: Colonnes de tâches
+Columns: Colonnes
+Create Column: Créer une colonne
+Edit Column: Modifier la colonne
+Default column for new tasks: Colonne par défaut pour les nouvelles tâches
+Closed status (tasks are considered done): Statut fermé (les tâches sont considérées comme terminées)
+Closed Status: Statut fermé
+Default: Par défaut
+Column created successfully: Colonne créée avec succès
+Column updated successfully: Colonne mise à jour avec succès
+Column deleted successfully: Colonne supprimée avec succès
+
+# Commentaires
+Comments: Commentaires
+Add Comment: Ajouter un commentaire
+Comment added: Commentaire ajouté
+Comment deleted: Commentaire supprimé
+Pin comment: Épingler le commentaire
+Unpin comment: Dépingler le commentaire
+No comments yet: Aucun commentaire pour le moment
+Write a comment...: Écrivez un commentaire...
+
+# Sous-tâches
+Subtasks: Sous-tâches
+Add Subtask: Ajouter une sous-tâche
+Subtask added: Sous-tâche ajoutée
+Subtask completed: Sous-tâche complétée
+Subtask deleted: Sous-tâche supprimée
+No subtasks: Aucune sous-tâche
+completed: complétée
+pending: en attente
+
+# Pièces jointes
+Attachments: Pièces jointes
+Upload File: Télécharger un fichier
+File uploaded: Fichier téléchargé
+File deleted: Fichier supprimé
+Download: Télécharger
+No attachments: Aucune pièce jointe
+File too large: Fichier trop volumineux
+Invalid file type: Type de fichier invalide
+
+# Dépendances
+Dependencies: Dépendances
+Blocked by: Bloquée par
+Blocks: Bloque
+Add dependency: Ajouter une dépendance
+Dependency added: Dépendance ajoutée
+Dependency removed: Dépendance supprimée
+No dependencies: Aucune dépendance
+Select task: Sélectionner une tâche
+Cannot depend on itself: Impossible de dépendre d'elle-même
+Circular dependency: Dépendance circulaire détectée
+
+# Historique
+History: Historique
+Task created: Tâche créée
+Task updated: Tâche mise à jour
+Status changed: Statut changé
+Assigned to: Assignée à
+from: de
+to: à
+No history: Aucun historique
+
+# Récurrence
+Recurrence: Récurrence
+Recurring Task: Tâche récurrente
+Frequency: Fréquence
+Daily: Quotidien
+Weekly: Hebdomadaire
+Monthly: Mensuel
+Yearly: Annuel
+Interval: Intervalle
+Every: Tous les
+days: jours
+weeks: semaines
+months: mois
+years: ans
+Days of week: Jours de la semaine
+Day of month: Jour du mois
+Start Date: Date de début
+End Date: Date de fin
+Next run: Prochaine exécution
+Last run: Dernière exécution
+Tasks created: Tâches créées
+Active: Actif
+
+# Filtres
+Filters: Filtres
+Search: Rechercher
+Search tasks...: Rechercher des tâches...
+Due Date From: Date d'échéance à partir de
+Due Date To: Date d'échéance jusqu'à
+Overdue only: En retard uniquement
+Clear filters: Effacer les filtres
+Apply filters: Appliquer les filtres
+
+# Actions en masse
+Bulk Actions: Actions en masse
+Select All: Sélectionner tout
+Deselect All: Désélectionner tout
+selected: sélectionnées
+Move to: Déplacer vers
+Assign to: Assigner à
+Change priority: Changer la priorité
+Delete selected: Supprimer la sélection
+Confirm bulk delete: Êtes-vous sûr de vouloir supprimer les tâches sélectionnées ?
+Tasks moved: Tâches déplacées avec succès
+Tasks assigned: Tâches assignées avec succès
+Tasks deleted: Tâches supprimées avec succès
+Priority changed: Priorité modifiée avec succès
+
+# Notifications
+Task assigned to you: Tâche assignée à vous
+Task due soon: Tâche due bientôt
+Task overdue: Tâche en retard
+New comment on task: Nouveau commentaire sur la tâche
+
+# Widgets
+My Assigned Tasks: Mes tâches assignées
+My Overdue Tasks: Mes tâches en retard
+Total Tasks: Total des tâches
+Tasks by Status: Tâches par statut

@@ -1,0 +1,25 @@
+{% macro task(task, view) %}
+    <div class="dropdown">
+        <a href="#" class="link-secondary" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+            <i class="fas fa-ellipsis-h"></i>
+        </a>
+        <div class="dropdown-menu dropdown-menu-end">
+                <a href="{{ path('task_show', {id: task.id}) }}" class="dropdown-item">
+                    {{ icon('visibility') }}
+                    {{ 'details'|trans }}
+                </a>
+                <a href="{{ path('task_edit', {id: task.id}) }}" class="dropdown-item">
+                    {{ icon('edit') }}
+                    {{ 'edit'|trans }}
+                </a>
+                <div class="dropdown-divider"></div>
+                <form action="{{ path('task_delete', {id: task.id}) }}" method="post" class="d-inline">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ task.id) }}">
+                    <button type="submit" class="dropdown-item text-danger" onclick="return confirm('{{ 'confirm.delete'|trans }}');">
+                        {{ icon('trash') }}
+                        {{ 'delete'|trans }}
+                    </button>
+                </form>
+        </div>
+    </div>
+{% endmacro %}

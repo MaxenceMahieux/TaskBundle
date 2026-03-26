@@ -1,0 +1,58 @@
+{% set subtasks = task.subtasks|default([])|sort((a, b) => a.position <=> b.position) %}
+{% set completedCount = subtasks|filter(s => s.completed)|length %}
+
+<div class="card mb-3">
+    <div class="card-header">
+        <h3 class="card-title">
+            {{ icon('success') }} {{ 'Subtasks'|trans }}
+            {% if subtasks|length > 0 %}
+            <span class="badge bg-blue-lt ms-2">{{ completedCount }}/{{ subtasks|length }}</span>
+            {% endif %}
+        </h3>
+    </div>
+    <div class="card-body p-0">
+        {% if subtasks|length == 0 %}
+        <div class="text-center text-muted py-4">
+            <p class="mb-0">{{ 'No subtasks'|trans }}</p>
+        </div>
+        {% else %}
+        <div class="list-group list-group-flush">
+            {% for subtask in subtasks %}
+            <div class="list-group-item d-flex align-items-center">
+                <form action="{{ path('task_subtask_toggle', {taskId: task.id, id: subtask.id}) }}" method="post" class="d-inline">
+                    <input type="hidden" name="_token" value="{{ csrf_token('subtask_toggle' ~ subtask.id) }}">
+                    <button type="submit" class="btn btn-sm p-0 me-2 {% if subtask.completed %}text-success{% else %}text-muted{% endif %}">
+                        {{ icon(subtask.completed ? 'success' : 'dot') }}
+                    </button>
+                </form>
+                <span class="{% if subtask.completed %}text-decoration-line-through text-muted{% endif %}">
+                    {{ subtask.title }}
+                </span>
+                {% if subtask.completed and subtask.completedBy %}
+                <small class="text-muted ms-auto">
+                    {{ subtask.completedAt|date_short }} - {{ subtask.completedBy.displayName }}
+                </small>
+                {% endif %}
+                <form action="{{ path('task_subtask_delete', {taskId: task.id, id: subtask.id}) }}" method="post" class="ms-2">
+                    <input type="hidden" name="_token" value="{{ csrf_token('subtask_delete' ~ subtask.id) }}">
+                    <button type="submit" class="btn btn-sm btn-ghost-danger p-1" onclick="return confirm('{{ 'confirm.delete'|trans }}');">
+                        {{ icon('trash') }}
+                    </button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    <div class="card-footer">
+        <form action="{{ path('task_subtask_add', {taskId: task.id}) }}" method="post">
+            <input type="hidden" name="_token" value="{{ csrf_token('subtask_add' ~ task.id) }}">
+            <div class="input-group">
+                <input type="text" class="form-control" name="title" placeholder="{{ 'Add Subtask'|trans }}..." required>
+                <button type="submit" class="btn btn-primary">
+                    {{ icon('create') }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

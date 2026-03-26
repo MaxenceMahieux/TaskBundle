@@ -1,0 +1,64 @@
+{% import "macros/widgets.html.twig" as widgets %}
+
+{% set comments = task.comments|default([]) %}
+
+<div class="card mb-3">
+    <div class="card-header">
+        <h3 class="card-title">
+            {{ icon('comment') }} {{ 'Comments'|trans }}
+            {% if comments|length > 0 %}
+            <span class="badge bg-blue-lt ms-2">{{ comments|length }}</span>
+            {% endif %}
+        </h3>
+    </div>
+    <div class="card-body p-0">
+        {% if comments|length == 0 %}
+        <div class="text-center text-muted py-4">
+            <p class="mb-0">{{ 'No comments yet'|trans }}</p>
+        </div>
+        {% else %}
+        <div class="list-group list-group-flush">
+            {% for comment in comments %}
+            <div class="list-group-item">
+                <div class="d-flex">
+                    <div class="me-3">
+                        {{ widgets.user_avatar(comment.createdBy, false, 'avatar-sm') }}
+                    </div>
+                    <div class="flex-fill">
+                        <div class="d-flex align-items-center mb-1">
+                            <strong>{{ comment.createdBy.displayName }}</strong>
+                            <small class="text-muted ms-2">{{ comment.createdAt|date_short }}</small>
+                            {% if comment.pinned %}
+                            <span class="badge bg-yellow-lt ms-2">{{ icon('pin') }} {{ 'Pinned'|trans }}</span>
+                            {% endif %}
+                        </div>
+                        <div>{{ comment.message|nl2br }}</div>
+                    </div>
+                    {% if comment.createdBy == app.user or is_granted('ROLE_ADMIN') %}
+                    <div class="ms-2">
+                        <form action="{{ path('task_comment_delete', {taskId: task.id, id: comment.id}) }}" method="post" class="d-inline">
+                            <input type="hidden" name="_token" value="{{ csrf_token('comment_delete' ~ comment.id) }}">
+                            <button type="submit" class="btn btn-sm btn-ghost-danger" onclick="return confirm('{{ 'confirm.delete'|trans }}');">
+                                {{ icon('trash') }}
+                            </button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    <div class="card-footer">
+        <form action="{{ path('task_comment_add', {taskId: task.id}) }}" method="post">
+            <input type="hidden" name="_token" value="{{ csrf_token('comment_add' ~ task.id) }}">
+            <div class="mb-2">
+                <textarea class="form-control" name="message" rows="2" placeholder="{{ 'Write a comment...'|trans }}" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">
+                {{ icon('mail-sent') }} {{ 'Add Comment'|trans }}
+            </button>
+        </form>
+    </div>
+</div>

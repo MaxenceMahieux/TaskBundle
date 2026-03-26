@@ -1,0 +1,165 @@
+Tasks: Tasks
+Task: Task
+Task List: Task List
+Kanban Board: Kanban Board
+Create Task: Create Task
+Edit Task: Edit Task
+Title: Title
+Description: Description
+Project: Project
+Assignee: Assignee
+Status: Status
+Priority: Priority
+Due Date: Due Date
+Estimated Time: Estimated Time
+Actions: Actions
+Save: Save
+Back: Back
+Back to list: Back to list
+Edit: Edit
+Delete: Delete
+No tasks found: No tasks found
+No tasks: No tasks
+All Projects: All Projects
+My tasks only: My tasks only
+List View: List View
+Created: Created
+Updated: Updated
+Unassigned: Unassigned
+Internal: Internal
+Overdue: Overdue
+Time Tracking: Time Tracking
+Total time spent: Total time spent
+Start Timer: Start Timer
+Stop Timer: Stop Timer
+Timer running since: Timer running since
+Time Entries: Time Entries
+User: User
+Date: Date
+Start: Start
+End: End
+Duration: Duration
+Customer: Customer
+Task Columns: Task Columns
+Columns: Columns
+Create Column: Create Column
+Edit Column: Edit Column
+Default column for new tasks: Default column for new tasks
+Closed status (tasks are considered done): Closed status (tasks are considered done)
+Closed Status: Closed Status
+Default: Default
+Column created successfully: Column created successfully
+Column updated successfully: Column updated successfully
+Column deleted successfully: Column deleted successfully
+
+# Comments
+Comments: Comments
+Add Comment: Add Comment
+Comment added: Comment added
+Comment deleted: Comment deleted
+Pin comment: Pin comment
+Unpin comment: Unpin comment
+No comments yet: No comments yet
+Write a comment...: Write a comment...
+
+# Subtasks
+Subtasks: Subtasks
+Add Subtask: Add Subtask
+Subtask added: Subtask added
+Subtask completed: Subtask completed
+Subtask deleted: Subtask deleted
+No subtasks: No subtasks
+completed: completed
+pending: pending
+
+# Attachments
+Attachments: Attachments
+Upload File: Upload File
+File uploaded: File uploaded
+File deleted: File deleted
+Download: Download
+No attachments: No attachments
+File too large: File too large
+Invalid file type: Invalid file type
+
+# Dependencies
+Dependencies: Dependencies
+Blocked by: Blocked by
+Blocks: Blocks
+Add dependency: Add dependency
+Dependency added: Dependency added
+Dependency removed: Dependency removed
+No dependencies: No dependencies
+Select task: Select task
+Cannot depend on itself: Cannot depend on itself
+Circular dependency: Circular dependency detected
+
+# History
+History: History
+Task created: Task created
+Task updated: Task updated
+Status changed: Status changed
+Assigned to: Assigned to
+from: from
+to: to
+No history: No history
+
+# Recurrence
+Recurrence: Recurrence
+Recurring Task: Recurring Task
+Frequency: Frequency
+Daily: Daily
+Weekly: Weekly
+Monthly: Monthly
+Yearly: Yearly
+Interval: Interval
+Every: Every
+days: days
+weeks: weeks
+months: months
+years: years
+Days of week: Days of week
+Day of month: Day of month
+Start Date: Start Date
+End Date: End Date
+Next run: Next run
+Last run: Last run
+Tasks created: Tasks created
+Active: Active
+
+# Filters
+Filters: Filters
+Search: Search
+Search tasks...: Search tasks...
+Due Date From: Due Date From
+Due Date To: Due Date To
+Overdue only: Overdue only
+Clear filters: Clear filters
+Apply filters: Apply filters
+
+# Bulk Actions
+Bulk Actions: Bulk Actions
+Select All: Select All
+Deselect All: Deselect All
+selected: selected
+Move to: Move to
+Assign to: Assign to
+Change priority: Change priority
+Delete selected: Delete selected
+Confirm bulk delete: Are you sure you want to delete the selected tasks?
+Tasks moved: Tasks moved successfully
+Tasks assigned: Tasks assigned successfully
+Tasks deleted: Tasks deleted successfully
+Priority changed: Priority changed successfully
+
+# Notifications
+Task assigned to you: Task assigned to you
+Task due soon: Task due soon
+Task overdue: Task overdue
+New comment on task: New comment on task
+
+# Widgets
+My Assigned Tasks: My Assigned Tasks
+My Overdue Tasks: My Overdue Tasks
+Total Tasks: Total Tasks
+Tasks by Status: Tasks by Status
