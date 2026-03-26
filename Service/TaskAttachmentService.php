@@ -35,8 +35,18 @@ class TaskAttachmentService
 
         // Capture file info BEFORE moving (move() invalidates the original file)
         $fileSize = $file->getSize() ?: 0;
-        $mimeType = $file->getMimeType() ?: $file->getClientMimeType() ?: 'application/octet-stream';
         $originalFilename = $file->getClientOriginalName();
+
+        // Try to get mime type safely - getMimeType() can fail if file is not readable
+        try {
+            $mimeType = $file->getMimeType();
+        } catch (\Exception $e) {
+            $mimeType = null;
+        }
+
+        if (empty($mimeType)) {
+            $mimeType = $file->getClientMimeType() ?: 'application/octet-stream';
+        }
 
         if ($fileSize > self::MAX_FILE_SIZE) {
             throw new Exception('File size exceeds maximum allowed size of 10MB');
